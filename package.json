@@ -1,7 +1,7 @@
 {
   "name": "lab-1",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,10 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.13",
-    "expo-status-bar": "~3.0.8",
-    "react": "19.1.0",
-    "react-native": "0.81.4"
+    "expo": "latest",
+    "expo-image-picker": "latest",
+    "expo-router": "latest",
+    "react": "^19.1.0",
+    "react-native-maps": "latest"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
