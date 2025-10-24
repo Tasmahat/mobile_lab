@@ -1,14 +1,14 @@
-import {Alert, Image, Pressable, StyleSheet, View} from "react-native";
-import React, {useEffect, useState} from "react";
+import { Image, Pressable, StyleSheet, View} from "react-native";
+import React from "react";
 
-export default function ImageList({imageUris, onImageDelete}) {
+export default function ImageList({imageDatas, onImageDelete}) {
     return(
         <View style={styles.imageContainer}>
-            {imageUris.map((uri, index) =>
-                <Pressable key={index} onLongPress={() => onImageDelete(index)}>
-                    <Image key={index}
+            {imageDatas.map(imageData =>
+                <Pressable key={imageData.id} onLongPress={() => onImageDelete(imageData.id)}>
+                    <Image key={imageData.id}
                            style={{width: 400, height: 400}}
-                           source={{uri: uri}}
+                           source={{uri: imageData.uri}}
                     />
                 </Pressable>
             )}

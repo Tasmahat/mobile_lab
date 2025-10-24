@@ -7,17 +7,15 @@ import {MarkerData} from "../types";
 export default function MarkerList({markerDatas} : MarkerData[]) {
     return(
         <View>
-            {markerDatas.map((markerData, index) =>
+            {markerDatas.map(markerData =>
                 <Marker
-                    key={index}
+                    key={markerData.id}
                     coordinate={markerData.coordinate}
                     tappable={true}
                     onPress={() => router.navigate({
                         pathname: 'marker/[id]',
                         params: {
-                            id: index,
-                            latitude: markerData.coordinate.latitude,
-                            longitude: markerData.coordinate.longitude
+                            id: markerData.id
                         }
                     })}
                 />

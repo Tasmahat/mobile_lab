@@ -1,8 +1,10 @@
 export interface MarkerData {
+    id: number;
     coordinate: {
         latitude: number,
         longitude: number
     };
+    images: ImageData[];
 }
 
 export interface ImageData {
@@ -11,8 +13,6 @@ export interface ImageData {
 
 export type ParamList = {
     'marker/[id]': {
-        id: string,
-        latitude: number,
-        longitude: number
+        id: string
     };
 };

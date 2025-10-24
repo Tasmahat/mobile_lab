@@ -1,12 +1,17 @@
-import React, {useState} from 'react';
-import {Text, Button, ScrollView, Alert, StyleSheet} from "react-native";
+import React, {useContext, useState} from 'react';
+import {Text, Button, ScrollView, Alert, StyleSheet, Image} from "react-native";
 import {router, useLocalSearchParams} from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
 import ImageList from "../../components/ImageList";
+import {useAppContext} from "../../components/AppContext";
+import {ImageData} from "../../types";
 
 export default function userMarker() {
-    const marker = useLocalSearchParams()
-    const [imageUris, setImageUris] = useState([])
+    const markerId = useLocalSearchParams();
+    const {markers, addImageToMarker, deleteImageFromMarker} = useAppContext();
+
+    const marker = markers.find(m => m.id == markerId.id);
+    const [imageDatas, setImageDatas] = useState<ImageData[]|undefined>(marker?.images);
 
     const deleteImage = (imageToDelete) => {
         Alert.alert('Удаление', 'Вы действительно хотите удалить данное фото?', [
@@ -18,9 +23,10 @@ export default function userMarker() {
             {
                 text: 'Да',
                 onPress: () => {
-                    setImageUris(oldValues => {
-                        return oldValues.filter((_, i) => i !== imageToDelete)
+                    setImageDatas(oldValues => {
+                        return oldValues?.filter(value => value.id !== imageToDelete)
                     });
+                    deleteImageFromMarker(+markerId.id, imageToDelete)
                     alert("Изображение удалено!")
                 }
             },
@@ -40,7 +46,12 @@ export default function userMarker() {
         }
 
         if (!result.canceled) {
-            setImageUris([...imageUris, result.assets[0].uri])
+            const imageData : ImageData = {
+                id: 0,
+                uri: result.assets[0].uri,
+            };
+            const imageId = addImageToMarker(+markerId.id, imageData)
+            setImageDatas([...imageDatas, {...imageData, id : imageId}]);
         }
     }
 
@@ -55,14 +66,14 @@ export default function userMarker() {
             />
             <Text style={styles.text}>
                 Маркер находится на координатах:{"\n"}
-                Широта: {marker.latitude}{"\n"}
-                Долгота: {marker.longitude}{"\n"}
+                Широта: {marker?.coordinate.latitude}{"\n"}
+                Долгота: {marker?.coordinate.longitude}{"\n"}
             </Text>
             <Button
                 onPress={addImage}
                 title={"Добавить изображение"}
             />
-            <ImageList imageUris={imageUris} onImageDelete={(key) => deleteImage(key)}/>
+            <ImageList imageDatas={imageDatas} onImageDelete={(key) => deleteImage(key)}/>
         </ScrollView>
     );
 }
