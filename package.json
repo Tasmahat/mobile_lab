@@ -12,12 +12,14 @@
     "expo": "latest",
     "expo-image-picker": "latest",
     "expo-router": "latest",
-    "react": "^19.1.0",
-    "react-native-maps": "latest"
+    "react": "19.1.0",
+    "react-native-maps": "latest",
+    "expo-sqlite": "latest"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "@types/sqlite3": "latest"
   },
   "private": true
 }

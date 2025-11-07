@@ -15,7 +15,9 @@ export default function MarkerList({markerDatas} : MarkerData[]) {
                     onPress={() => router.navigate({
                         pathname: 'marker/[id]',
                         params: {
-                            id: markerData.id
+                            id: markerData.id,
+                            latitude: markerData.coordinate.latitude,
+                            longitude: markerData.coordinate.longitude
                         }
                     })}
                 />

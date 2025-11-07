@@ -8,11 +8,14 @@ export interface MarkerData {
 }
 
 export interface ImageData {
+    id: number;
     uri: string;
 }
 
 export type ParamList = {
     'marker/[id]': {
-        id: string
+        id: string,
+        latitude: number,
+        longitude: number
     };
 };

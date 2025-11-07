@@ -1,25 +1,34 @@
-import React, {useContext, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import MapView from 'react-native-maps';
 import { StyleSheet, View } from 'react-native';
 import MarkerList from "../components/MarkerList";
 import {Try} from "expo-router/build/views/Try";
 import {MapError} from "../components/MapError";
-import AppContext, {useAppContext} from "../components/AppContext";
-import {MarkerData} from "../types";
+import {useDatabaseContext} from "../contexts/DatabaseContext";
 
 export default function Index() {
-    const {markers, addMarker} = useAppContext();
+    const {addMarker, getMarkers, isLoading} = useDatabaseContext();
+
+    const [markers, setMarkers] = useState([]);
+
+    useEffect(() => {
+        const loadMarkers = async () => {
+            try {
+                const markersFromDb = await getMarkers();
+                setMarkers(markersFromDb)
+            } catch (error) {
+                console.log("Ошибка загрузки маркеров", error);
+            }
+        }
+
+        if (!isLoading) {
+            loadMarkers()
+        }
+    }, [isLoading]);
 
     const longPressHandler = (e) => {
-        const markerData: MarkerData = {
-            id: 0,
-            coordinate : {
-                latitude: e.nativeEvent.coordinate.latitude,
-                longitude: e.nativeEvent.coordinate.longitude
-            },
-            images: []
-        }
-        addMarker(markerData);
+        addMarker(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)
+            .then(x => setMarkers([...markers, x]));
     }
 
     return (

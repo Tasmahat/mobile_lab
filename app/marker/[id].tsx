@@ -1,19 +1,42 @@
-import React, {useContext, useState} from 'react';
-import {Text, Button, ScrollView, Alert, StyleSheet, Image} from "react-native";
+import React, {useEffect, useState} from 'react';
+import {Text, Button, ScrollView, Alert, StyleSheet, View} from "react-native";
 import {router, useLocalSearchParams} from "expo-router";
 import * as ImagePicker from 'expo-image-picker';
 import ImageList from "../../components/ImageList";
-import {useAppContext} from "../../components/AppContext";
 import {ImageData} from "../../types";
+import {useDatabaseContext} from "../../contexts/DatabaseContext";
 
 export default function userMarker() {
-    const markerId = useLocalSearchParams();
-    const {markers, addImageToMarker, deleteImageFromMarker} = useAppContext();
+    const marker = useLocalSearchParams();
+    const {deleteMarker, addImage, deleteImage, getMarkerImages, isLoading} = useDatabaseContext();
 
-    const marker = markers.find(m => m.id == markerId.id);
-    const [imageDatas, setImageDatas] = useState<ImageData[]|undefined>(marker?.images);
+    const [images, setImages] = useState<ImageData[]>([]);
 
-    const deleteImage = (imageToDelete) => {
+    useEffect(() => {
+        const loadImages = async () => {
+            try {
+                const imagesFromDb = await getMarkerImages(+marker.id);
+                setImages(imagesFromDb)
+            } catch (error) {
+                console.log("Ошибка загрузки изображений", error);
+            }
+        }
+
+        if (!isLoading) {
+            loadImages()
+        }
+    }, [isLoading]);
+
+    const deleteMarkerFromMap = () => {
+        deleteMarker(+marker.id).then(() => {
+            router.navigate({
+                pathname: '/'
+            });
+            alert("Маркер был удален!")
+        });
+    }
+
+    const deleteImageFromMarker = (imageToDelete) => {
         Alert.alert('Удаление', 'Вы действительно хотите удалить данное фото?', [
             {
                 text: 'Нет!',
@@ -23,17 +46,17 @@ export default function userMarker() {
             {
                 text: 'Да',
                 onPress: () => {
-                    setImageDatas(oldValues => {
-                        return oldValues?.filter(value => value.id !== imageToDelete)
+                    setImages(oldValues => {
+                        return oldValues.filter(value => value.id !== imageToDelete)
                     });
-                    deleteImageFromMarker(+markerId.id, imageToDelete)
+                    deleteImage(+imageToDelete)
                     alert("Изображение удалено!")
                 }
             },
         ]);
     }
 
-    const addImage = async () => {
+    const addImageToMarker = async () => {
         let result;
         try {
             result = await ImagePicker.launchImageLibraryAsync({
@@ -46,34 +69,37 @@ export default function userMarker() {
         }
 
         if (!result.canceled) {
-            const imageData : ImageData = {
-                id: 0,
-                uri: result.assets[0].uri,
-            };
-            const imageId = addImageToMarker(+markerId.id, imageData)
-            setImageDatas([...imageDatas, {...imageData, id : imageId}]);
+            addImage(+marker.id, result.assets[0].uri)
+                .then(x => setImages([...images, x]));
         }
     }
 
     return (
         <ScrollView style={styles.mainContainer}>
             <Button
-                color={"#8d2424"}
+                color={"#f59205"}
                 onPress={() => router.navigate({
                     pathname: '/'
                 })}
                 title={"Вернуться на главную"}
             />
-            <Text style={styles.text}>
-                Маркер находится на координатах:{"\n"}
-                Широта: {marker?.coordinate.latitude}{"\n"}
-                Долгота: {marker?.coordinate.longitude}{"\n"}
-            </Text>
-            <Button
-                onPress={addImage}
-                title={"Добавить изображение"}
-            />
-            <ImageList imageDatas={imageDatas} onImageDelete={(key) => deleteImage(key)}/>
+            <View style={styles.mainBlock}>
+                <Button
+                    color={"#b70909"}
+                    onPress={deleteMarkerFromMap}
+                    title={"Удалить маркер"}
+                />
+                <Text style={styles.text}>
+                    Маркер находится на координатах:{"\n"}
+                    Широта: {marker.latitude}{"\n"}
+                    Долгота: {marker.longitude}{"\n"}
+                </Text>
+                <Button
+                    onPress={addImageToMarker}
+                    title={"Добавить изображение"}
+                />
+                <ImageList imageDatas={images} onImageDelete={(key) => deleteImageFromMarker(key)}/>
+            </View>
         </ScrollView>
     );
 }
@@ -83,8 +109,11 @@ const styles = StyleSheet.create({
         marginTop: 50,
     },
     text: {
-        marginTop: 40,
+        marginTop: 20,
         fontSize: 18,
         textAlign: "center"
+    },
+    mainBlock: {
+        marginTop: 50
     }
 });
