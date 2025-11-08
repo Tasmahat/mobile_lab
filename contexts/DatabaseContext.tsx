@@ -40,7 +40,10 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const addMarker = async (latitude: number, longitude: number) => {
         if (db instanceof SQLiteDatabase) {
             let row = await db.getFirstAsync<{ id : number }>(`select max(id) as id from markers`)
-            let markerId = row?.id == null ? 1 : row.id + 1
+            let markerId;
+            if (row) {
+                markerId = await row?.id == null ? 1 : row.id + 1
+            }
             await db.runAsync(`insert into markers(id, latitude, longitude, created_at) values (?, ?, ?, ?)`,
                 markerId, latitude, longitude, new Date().toLocaleString())
             return {
@@ -90,7 +93,10 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const addImage = async (markerId: number, uri: string) => {
         if (db instanceof SQLiteDatabase) {
             let row = await db.getFirstAsync<{id : number}>(`select max(id) as id from marker_images`)
-            let imageId = row?.id == null ? 1 : row.id + 1
+            let imageId;
+            if (row) {
+                imageId = await row?.id == null ? 1 : row.id + 1
+            }
             await db.runAsync(`insert into marker_images(id, marker_id, uri, created_at) values (?, ?, ?, ?)`,
                 imageId, markerId, uri, new Date().toLocaleString())
             return {
