@@ -45,11 +45,11 @@ export default function userMarker() {
             },
             {
                 text: 'Да',
-                onPress: () => {
+                onPress: async () => {
                     setImages(oldValues => {
                         return oldValues.filter(value => value.id !== imageToDelete)
                     });
-                    deleteImage(+imageToDelete)
+                    await deleteImage(+imageToDelete)
                     alert("Изображение удалено!")
                 }
             },
@@ -69,7 +69,7 @@ export default function userMarker() {
         }
 
         if (!result.canceled) {
-            addImage(+marker.id, result.assets[0].uri)
+            await addImage(+marker.id, result.assets[0].uri)
                 .then(x => setImages([...images, x]));
         }
     }

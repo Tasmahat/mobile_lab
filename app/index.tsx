@@ -26,8 +26,8 @@ export default function Index() {
         }
     }, [isLoading]);
 
-    const longPressHandler = (e) => {
-        addMarker(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)
+    const longPressHandler = async (e) => {
+        await addMarker(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)
             .then(x => setMarkers([...markers, x]));
     }
 
