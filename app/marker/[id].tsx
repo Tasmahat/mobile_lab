@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import ImageList from "../../components/ImageList";
 import {ImageData} from "../../types";
 import {useDatabaseContext} from "../../contexts/DatabaseContext";
+import {notificationManager} from "../../services/notifications";
 
 export default function userMarker() {
     const marker = useLocalSearchParams();
@@ -28,6 +29,7 @@ export default function userMarker() {
     }, [isLoading]);
 
     const deleteMarkerFromMap = () => {
+        notificationManager.removeNotification(+marker.id);
         deleteMarker(+marker.id).then(() => {
             router.navigate({
                 pathname: '/'

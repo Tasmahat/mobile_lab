@@ -13,8 +13,11 @@
     "expo-image-picker": "latest",
     "expo-router": "latest",
     "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native-maps": "latest",
-    "expo-sqlite": "latest"
+    "expo-sqlite": "latest",
+    "expo-location": "latest",
+    "expo-notifications": "latest"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
